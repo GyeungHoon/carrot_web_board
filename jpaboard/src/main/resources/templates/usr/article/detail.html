@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{usr/common/layout}">
+<head>
+  <title>게시물 본문</title>
+</head>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<main class="main" layout:fragment="main">
+  <article class="detail">
+  <h2 class="ir_su">게시물 본문</h2>
+
+<!--  <div>-->
+<!--    <a th:if="${article.user.idx == session.loginedUserId}" th:href="@{modify(idx=${article.idx})}">글 수정</a>-->
+<!--    <a th:if="${article.user.idx == session.loginedUserId}"-->
+<!--       onclick="if ( confirm('정말로 삭제하겠습니까?') == false ) return false;" th:href="@{doDelete(idx=${article.idx})}">글-->
+<!--      삭제</a>-->
+<!--  </div>-->
+<!--  <div>-->
+<!--    <div>-->
+<!--      <div>번호</div>-->
+<!--      <div>-->
+<!--        [[${article.idx}]]-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <hr>-->
+
+    <table class="detail__table">
+      <tr>
+      <th>작성날짜</th>
+      <td> [[${article.regDate}]]</td>
+      </tr>
+
+      <tr>
+        <th>고유번호</th>
+        <td> [[${article.groupId}]]</td>
+      </tr>
+
+      <tr>
+        <th>업로드주소</th>
+        <td class="overflow--text">[[${article.virtualAddress}]]</td>
+      </tr>
+      <tr>
+        <th>게시글주소</th>
+        <td class="overflow--text"><a th:href="${article.articleUrl}" target="_blank" rel="noopener noreferrer">게시글 주소로 이동</a></td>
+      </tr>
+      <tr>
+        <th>게시글작성계정</th>
+        <td class="overflow--text"> [[${article.articleInstanceName}]]</td>
+      </tr>
+      <tr>
+        <th>댓글작성계정</th>
+        <td class="overflow--text" th:each="comment : ${comments}"> [[${comment.commentInstanceName}]]</td>
+      </tr>
+      <tr>
+        <th>대댓글작성계정</th>
+        <td class="overflow--text" th:each="reply : ${replys}"> [[${reply.replyInstanceName}]]</td>
+      </tr>
+      <tr>
+      <th>제목</th>
+      <td class="overflow--text"> [[${article.title}]]</td>
+      </tr>
+
+      <tr>
+      <th>내용</th>
+      <td class="overflow--text"> [[${article.body}]]</td>
+      </tr>
+
+      <tr>
+      <th>본문이미지주소</th>
+      <td class="overflow--text"> [[${article.mainImageUrls}]]</td>
+      </tr>
+
+      <tr>
+      <th>본문우편번호</th>
+      <td> [[${article.placeZipcode}]]</td>
+      </tr>
+
+      <tr>
+      <th>본문주소</th>
+      <td class="overflow--text"> [[${article.placeAddress}]]</td>
+      </tr>
+
+      <tr>
+      <th>본문상세주소</th>
+      <td class="overflow--text"> [[${article.placeAddressDetail}]]</td>
+      </tr>
+
+      <tr>
+      <th>주제</th>
+      <td class="overflow--text"> [[${article.subject}]]</td>
+      </tr>
+
+      <tr>
+      <th>댓글</th>
+      <td class="overflow--text">
+        <div th:each="comment : ${comments}">
+          <div>[[${comment.commentContent}]]</div>
+          <div>장소주소: [[${comment.commentAddress}]]</div>
+          <div>상세주소: [[${comment.commentAddressDetail}]]</div>
+          <div>추가항목: [[${comment.commentAddressExtra}]]</div>
+          <div>사진주소: [[${comment.imageUrl}]]</div>
+        </div>
+      </td>
+      </tr>
+
+      <tr>
+      <th>대댓글</th>
+      <td class="overflow--text">
+        <div th:each="reply : ${replys}">
+          <div>[[${reply.replyContent}]]</div>
+        </div>
+      </td>
+      </tr>
+    </table>
+
+  </article>
+</main>
+
+</html>

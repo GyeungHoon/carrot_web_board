@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{usr/common/layout}">
+<head>
+  <title>게시물 수정</title>
+</head>
+
+<main layout:fragment="main">
+  <h1>게시물 수정</h1>
+
+  <div>
+    <a th:href="@{detail(id=${article.idx})}">글 본문</a>
+  </div>
+
+  <form action="doModify" method="POST">
+    <input type="hidden" name="idx" th:value="${article.idx}">
+    <div>
+      <div>제목</div>
+      <div>
+        <input type="text" name="title" placeholder="제목을 입력해주세요." th:value="${article.title}">
+      </div>
+    </div>
+    <div>
+      <div>내용</div>
+      <div>
+        <textarea name="body" placeholder="내용을 입력해주세요." th:text="${article.title}"></textarea>
+      </div>
+    </div>
+    <div>
+      <div>수정</div>
+      <div>
+        <input type="submit" value="수정">
+      </div>
+    </div>
+  </form>
+</main>
+
+</html>

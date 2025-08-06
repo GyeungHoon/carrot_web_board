@@ -1,0 +1,27 @@
+.detail{
+    width:1200px;
+    height:100%;
+}
+.detail .detail__table{
+    width:1200px;
+}
+.detail .detail__table tr{
+    width:1200px;
+}
+.detail .detail__table tr th{
+    width:120px;
+    padding:5px;
+    font-size:16px;
+    border:1px solid black;
+    text-align: center;
+    vertical-align: middle;
+}
+.detail .detail__table tr td{
+    border:1px solid black;
+    padding:5px;
+}
+
+.detail .overflow--text{
+  overflow: hidden;
+  word-break: break-all; /* 긴 단어도 강제로 줄바꿈 */
+}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{usr/common/layout}">
+<head>
+  <title>마이페이지</title>
+</head>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+
+<main class="main" layout:fragment="main">
+  <article class="mypage" th:if="${session.loginedUserId} != null">
+    <h2 class="mypage__title ir_su">mypage</h2>
+
+    <table class="mypage__table" th:if="${user.idx == session.loginedUserId}" th:each="user : ${users}">
+      <tr>
+        <th class="mypage__th">아이디</th>
+        <td class="mypage__td">[[${user.userId}]]</td>
+      </tr>
+      <tr>
+        <th class="mypage__th">이름</th>
+        <td class="mypage__td">[[${user.name}]]</td>
+      </tr>
+      <tr>
+        <th class="mypage__th">회사</th>
+        <td class="mypage__td">[[${user.company}]]</td>
+      </tr>
+      <tr>
+        <th class="mypage__th">잔액</th>
+        <td class="mypage__td">[[${user.balance}]]</td>
+      </tr>
+    </table>
+
+    <form class="mypage__form" action="doAddMoney" method="post"  th:if="${user.idx == session.loginedUserId and session.loginedUserId == 1 }">
+    <label class="ir_su" for="mypage__user" th:if="${user.idx == session.loginedUserId and session.loginedUserId == 1 }">회원을 선택하세요</label>
+    <select class="mypage__select" id="mypage__user" name="idx" th:if="${user.idx == session.loginedUserId and session.loginedUserId == 1 }">
+      <option value="" disabled selected>회원을 선택해주세요.</option>
+      <option th:each="u : ${users}"
+              th:value="${u.idx}"
+              th:text="'아이디 : ' + ${u.userId} + ' / 잔액 : ' + ${u.balance}">
+      </option>
+    </select>
+      <input name="addMoney" type="number" placeholder="충전금액을 입력해주세요.">
+      <button type="submit">제출</button>
+    </form>
+
+  </article>
+</main>
+</html>

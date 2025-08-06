@@ -1,0 +1,148 @@
+/* header start*/
+.header {height: 50px; background-color: #1A2036; color: #fff;}
+ .header .header__nav {
+  height: 50px;
+ } 
+.header__nav-list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  position: relative;
+  font-size: 21px;
+   
+}
+
+.header__nav-spacer {
+  flex: 1; /* 왼쪽 여백 */
+}
+
+.header__nav-item--center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.header__nav-item--right {
+  display: flex;
+  gap: 24px;
+  margin-right: 20px;
+}
+
+  
+/* header end */
+
+
+
+
+.main .signup {
+    width: 500px;
+    height: 550px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #c0c0c0;
+    position: relative;
+}
+
+.main .signup .signup__title {
+    position: absolute;
+    top: 50px;
+    font-size: 30px;
+}
+
+.main .signup .signup__form {
+    position: relative;
+    margin-top: 50px;
+}
+.main .signup .signup__form .signup__input-wrapper {
+    position: relative;
+}
+
+.main .signup .signup__form .signup__input-wrapper .signup__input-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    pointer-events: none;
+    font-size: 16px;
+  }
+
+.main .signup .signup__form .signup__input-wrapper .signup__input {
+    width: 290px;
+    height: 40px;
+    padding-left: 36px; /* 아이콘 공간 확보 */
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 5px;
+    font-size: 14px;
+    border: 1px solid #c0c0c0;
+}
+
+.main .signup .signup__form .signup__input-wrapper .signup__input::placeholder {
+    color: #c0c0c0;
+}
+
+.main .signup .signup__form .signup__button{
+    width: 290px;
+    height: 50px;
+    border: #1A2036;
+    background-color: #1A2036;
+    color: #fff;
+    border: 0;
+    border-radius: 5px;
+    margin-top: 20px;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.main .signup .signup__form .signup__button:active {
+    color: #000;
+    border:solid 1px #1A2036;
+    background-color: rgba(255, 255, 255, 0);
+    
+  }
+
+/* main end */
+
+
+/* footer start */
+.footer {
+    height: 50px;
+    background-color: #1A2036;
+    color: #fff;
+    
+}
+
+.footer .footer__copyright{
+    width: 100%;
+    height: 100%;
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+/* footer end */
+
+
+
+/* 미디어 쿼리 */
+
+/* 태블릿 이하 */
+@media (max-width: 1024px) {
+    .container {
+        max-width: 100%;
+        padding: 0 16px;
+    }
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 12px;
+    }
+}

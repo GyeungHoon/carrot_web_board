@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{usr/common/layout}">
+<head>
+  <title>게시물 작성</title>
+</head>
+
+<main class="main" layout:fragment="main">
+  <!-- 로딩 오버레이 -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div id="loadingContainer">
+      <div id="spinner"></div>
+    </div>
+  </div>
+
+  <article class="myinfo">
+    <div class="myinfo__wrap">
+      <ul class="myinfo__list myinfo__list--account">
+        <li class="myinfo__item">이름 : <span th:text="${loginedUser.name}"></span></li>
+        <li class="myinfo__item">잔액 : <span th:text="${loginedUser.balance}"></span></li>
+      </ul>
+    </div>
+  </article>
+
+  <form action="doWrite" method="POST" class="notice" enctype="multipart/form-data" id="uploadForm">
+    <h2 class="notice__title">바이럴 마케팅 글 작성</h2>
+
+    <div class="notice__main--content">
+    <label class="notice__label" for="content">게시글 내용</label>
+    <input class="notice__title notice__form-element" name="title" maxlength="50" placeholder="제목을 입력해주세요. 5글자이상(필수)" data-target="titleCount" minlength="5">
+    <p id="titleCount">0 / 50</p>
+    <textarea class="notice__content notice__form-element" id="content" name="body" placeholder="내용을 입력해주세요. 20글자이상(필수)" maxlength="500" data-target="contentCount" minlength="20"></textarea>
+    <p id="contentCount">0 / 500</p>
+    </div>
+    <div class="notice__select-group">
+      <div class="notice__select-box">
+        <!-- 본문 사진 다중첨부 -->
+
+        <div class="notice__img">
+          <label for="mainImageInput" class="notice__label">본문 사진선택</label>
+          <input type="file" class="notice_file--select" id="mainImageInput" accept="image/*" multiple aria-label="본문 이미지 (최대 8장)"/>
+          <!-- 썸네일 여러 개 표시용 컨테이너 -->
+          <div id="mainPreviewContainer"></div>
+          <input type="hidden" id="mainImageUrls" name="mainImageUrls" />
+        </div>
+
+        <!-- 탭 버튼 -->
+        <div class="tab-container">
+          <button type="button" class="tab-button active" data-tab="address">주소 입력</button>
+          <button type="button" class="tab-button" data-tab="instance">인스턴스 선택</button>
+        </div>
+
+        <!-- 주소 입력 탭 -->
+        <div id="address-tab" class="tab-content active">
+          <label class="notice__label" for="virtualAddress">작업지역주소</label>
+          <input class="notice__form-element readonly" type="text" id="virtualAddress" name="virtualAddress" placeholder="주소를 입력해주세요.(필수)" readonly/>
+          <input type="hidden" id="longitude" name="longitude" placeholder="경도" readonly>
+          <input type="hidden" id="latitude" name="latitude" placeholder="위도" readonly>
+          <button type="button" class="notice__form-element notice__button" onclick="execDaumPostcode()" aria-label="우편번호 검색 팝업 열기">우편번호 찾기</button>
+        </div>
+
+          <!-- 인스턴스 선택 탭 -->
+          <div id="instance-tab" class="tab-content">
+            <label class="notice__label" for="instanceInput">인스턴스 선택</label>
+            <input type="text" id="instanceInput" class="notice__account-select notice__form-element" placeholder="인스턴스를 선택해주세요(필수)" readonly />
+            <input type="hidden" id="selectedInstance" name="selectedInstance" />
+            <button type="button" class="notice__form-element notice__button" onclick="openInstanceModal()">인스턴스 선택</button>
+          </div>
+
+          <!-- 인스턴스 선택 모달 -->
+          <div id="instanceModal" class="modal">
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <h3>인스턴스 선택</h3>
+              <input type="text" id="instanceSearch" class="instance-search" placeholder="인스턴스 검색..." />
+              <div class="instance-list">
+                                        <div th:each="entry : ${filteredInstances.entrySet()}" 
+                             class="instance-item" 
+                             th:data-value="${entry.value.virtualAddress}"
+                             th:data-virtual-address="${entry.value.virtualAddress}"
+                             th:data-longitude="${entry.value.longitude}"
+                             th:data-latitude="${entry.value.latitude}"
+                             th:text="${entry.key}">
+                             <!--th:text="${entry.key + ' (' + entry.value.count + '개)'}">-->
+                        </div>
+              </div>
+            </div>
+          </div>
+
+
+        <label class="notice__label" for="placeAddress">플레이스</label>
+        <input class="notice__form-element" type="hidden" id="placeZipcode" name="placeZipcode" placeholder="우편번호" readonly/>
+        <input class="notice__form-element readonly" type="text" id="placeAddress" name="placeAddress" onclick="execDaumPostcode_place()" placeholder="플레이스를 입력해주세요(필수)." aria-label="우편번호 검색 팝업 열기" readonly/>
+        <input class="notice__form-element" type="text" id="placeAddressDetail" name="placeAddressDetail" placeholder="장소이름(필수)" />
+        <input class="notice__form-element" type="hidden" id="placeAddressExtra" name="placeAddressExtra" placeholder="참고항목" />
+
+
+      </div>
+      <div class="notice__select-box">
+        <label class="notice__label" for="subject">주제 선택</label>
+        <select class="notice__select notice__form-element notice__subtext-element" name="subject" id="subject">
+          <optgroup label="동네정보">
+            <option value disabled selected>주제를 선택해주세요.(필수)</option>
+            <option value="맛집">맛집</option>
+            <option value="생활/편의">생활/편의</option>
+            <option value="병원/약국">병원/약국</option>
+            <option value="이사/시공">이사/시공</option>
+            <option value="주거/부동산">주거/부동산</option>
+            <option value="교육">교육</option>
+            <option value="미용">미용</option>
+          </optgroup>
+          <optgroup label="이웃과 함께">
+            <option value="반려동물">반려동물</option>
+            <option value="운동">운동</option>
+            <option value="고민/사연">고민/사연</option>
+            <option value="동네친구">동네친구</option>
+            <option value="취미">취미</option>
+            <option value="동네풍경">동네풍경</option>
+            <option value="임신/육아">임신/육아</option>
+          </optgroup>
+          <optgroup label="소식">
+            <option value="분실/실종">분실/실종</option>
+            <option value="동네사건사고">동네사건사고</option>
+          </optgroup>
+          <optgroup label="기타">
+            <option value="일반">일반</option>
+          </optgroup>
+        </select>
+
+        <div class="notice__comment">
+          <div class="notice__comment-group">
+            <label class="notice__label" for="comment">댓글 내용</label>
+            <textarea
+                    class="notice__form-element notice__subtext-element notice__form--comment"
+                    id="comment"
+                    placeholder="댓글을 입력해주세요.(필수)"
+                    maxlength="200"
+                    data-target="commentCount"
+                    name="commentContent"
+            ></textarea>
+            <p id="commentCount">0 / 200</p>
+          </div>
+          <div class="notice__comment-group notice__comment-group2">
+            <div class="notice__addr">
+              <label class="notice__label" for="commentAddress">댓글 주소</label>
+              <input class="notice__form-element" type="hidden" id="commentZipcode" name="commentZipcode" placeholder="우편번호" />
+              <input class="notice__form-element notice__subtext-element readonly" type="text" id="commentAddress" name="commentAddress" onclick="execDaumPostcode_comment()" placeholder="주소를 입력해주세요." aria-label="우편번호 검색 팝업 열기" readonly/>
+              <input class="notice__form-element notice__subtext-element" type="text" id="commentAddressDetail" name="commentAddressDetail" placeholder="상세주소를 입력해주세요.">
+              <input class="notice__form-element notice__subtext-element" type="hidden" id="commentAddressExtra" name="commentAddressExtra">
+              <label class="notice__label" for="imageInput">댓글 사진</label>
+              <input type="file" class="notice_file--select" id="imageInput" accept="image/*"/>
+            </div>
+            <div class="notice__img">
+              <!-- 썸네일 -->
+<!--              <img id="preview" style="width: 130px; height: 100px; object-fit: cover; display: none" />-->
+              <input type="hidden" id="imageUrl" name="imageUrl" />
+            </div>
+          </div>
+        </div>
+
+        <div class="notice__reply">
+          <label class="notice__label" for="reply">대댓글 내용</label>
+          <textarea class="notice__form-element notice__subtext-element" id="reply" name="reply_content" placeholder="대댓글을 입력해주세요.(필수)" maxlength="200" data-target="replyCount"></textarea>
+          <p id="replyCount">0 / 200</p>
+        </div>
+      </div>
+    </div>
+    <button type="submit" class="notice__button--submit" id="submitBtn" disabled>제출</button>
+  </form>
+</main>
+</html>

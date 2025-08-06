@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{usr/common/layout}">
+<head>
+    <title>작업내역</title>
+    <link rel="stylesheet" th:href="@{/css/list.css}">
+</head>
+
+<main class="main" layout:fragment="main">
+    <article class="worklist" th:if="${session.loginedUserId != null and articles != null}">
+    <h2 class="ir_su">작업내역</h2>
+    <ul class="worklist__contents">
+        <li th:each="article : ${articles}">
+            <a th:href="@{detail(idx=${article.idx})}">
+                <span>[[${article.regDate}]]</span>
+                <span>[[${article.title}]]</span>
+                <span>[[${article.user.userId}]]</span>
+<!--                <span th:each="reply : ${replys}" th:if="${reply.groupId == article.groupId}">-->
+<!--                   <span th:classappend="${reply.status == 'success'} ? 'status-success' : 'status-pending'">-->
+<!--                       <span class="status-dot"></span>-->
+<!--                   </span>-->
+<!--                    &lt;!&ndash; break; &ndash;&gt;-->
+<!--                </span>-->
+                <!-- Article status -->
+                <span>
+                    <span th:classappend="${article.status == 'success'} ? 'status-success' : 'status-pending'">
+                        <span class="status-dot"></span>
+                    </span>
+                    <!-- Comment status -->
+                    <span th:each="comment : ${comments}" th:if="${comment.groupId == article.groupId}" th:classappend="${comment.status == 'success'} ? 'status-success' : 'status-pending'">
+                        <span class="status-dot"></span>
+                        <!-- break; -->
+                    </span>
+                    <!-- Reply status -->
+                    <span th:each="reply : ${replys}" th:if="${reply.groupId == article.groupId}" th:classappend="${reply.status == 'success'} ? 'status-success' : 'status-pending'">
+                        <span class="status-dot"></span>
+                        <!-- break; -->
+                    </span>
+                </span>
+            </a>
+        </li>
+    </ul>
+    </article>
+</main>
+</html>

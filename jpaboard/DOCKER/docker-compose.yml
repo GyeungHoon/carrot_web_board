@@ -1,0 +1,44 @@
+version: '3.7'
+
+services:
+  webserver:
+    image: karrot:1
+    build: ..
+    develop:
+      watch:
+        - action: sync+restart
+          path: ..
+          target: /app
+    ports:
+      - 8080:8080
+    restart: always
+    networks:
+      - mynet1
+      - mynet2
+
+  nginx:
+    image: nginx:1
+    ports:
+      - 80:80
+    restart: always
+    networks:
+      - mynet1
+      - mynet2  # nginx도 mynet2에 추가
+
+#  db:
+#    image: postgres:17-alpine
+#    environment:
+#      - POSTGRES_USER=admin
+#      - POSTGRES_PASSWORD=VMware1!
+#    volumes:
+#      - karrot_vol:/var/lib/postgresql/data
+#    networks:
+#      - mynet2
+#    restart: always
+
+networks:
+  mynet1:
+  mynet2:
+
+volumes:
+  karrot_vol:
