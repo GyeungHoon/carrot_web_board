@@ -1,0 +1,28 @@
+업로드 해주는 프롬프트창
+
+admin@DESKTOP-OJFCL8U MINGW64 ~/desktop
+$ cd ~/desktop
+
+admin@DESKTOP-OJFCL8U MINGW64 ~/desktop
+$ chmod 400 mainkey.pem
+
+
+admin@DESKTOP-OJFCL8U MINGW64 ~/desktop
+$ scp -i mainkey.pem ~/desktop/jpaBoard-0.0.1-SNAPSHOT-plain.jar ubuntu@ec2-3-34-183-83.ap-northeast-2.compute.amazonaws.com:~/
+
+admin@DESKTOP-OJFCL8U MINGW64 ~/desktop
+$ scp -i mainkey.pem ~/desktop/jpaBoard.jar ubuntu@ec2-3-34-183-83.ap-northeast-2.compute.amazonaws.com:~/
+
+
+ec2 구동하는 명령어
+
+우분트로 접속하기 
+admin@DESKTOP-OJFCL8U MINGW64 ~/desktop
+$ scp -i mainkey.pem ~/desktop/jpaBoard-0.0.1-SNAPSHOT-plain.jar ubuntu@ec2-3-34-183-83.ap-northeast-2.compute.amazonaws.com:~/
+
+ubuntu@ip-172-31-40-125:~$ ps aux | grep jpaBoard
+
+ubuntu@ip-172-31-40-125:~$ sudo pkill -f jpaBoard
+
+ubuntu@ip-172-31-40-125:~$ nohup java -jar jpaBoard.jar > jpaBoard.log 2>&1 &
+
