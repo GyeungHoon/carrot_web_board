@@ -8,6 +8,8 @@ DROP DATABASE IF EXISTS MARKETING_BD;
 CREATE DATABASE MARKETING_BD;
 USE MARKETING_BD;
 
+
+
 # 회원테이블 생성
 CREATE TABLE `user` (
     `idx` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, -- 내부 식별용 인덱스
@@ -26,7 +28,7 @@ CREATE TABLE `user` (
 
 
 # 회원데이터 생성
-INSERT INTO user (
+INSERT INTO `user` (
 	user_id,
     reg_date,
     update_date,
@@ -44,127 +46,121 @@ INSERT INTO user (
     10
 );
 
-INSERT INTO user (
-	user_id,
-    reg_date,
-    update_date,
-    `password`,
-    `name`,
-    company,
-    balance
-) VALUES (
-	'user1',
-    NOW(),
-    NOW(),
-    '1234',
-    '홍길동',
-    'ABC회사',
-    0
-);
-
-INSERT INTO user (
-	user_id,
-    reg_date,
-    update_date,
-    `password`,
-    `name`,
-    company,
-    balance
-) VALUES (
-	'user2',
-    NOW(),
-    NOW(),
-    '1234',
-    '김유신',
-    '물류회사',
-    0
-);
 
 
-INSERT INTO user (
-	user_id,
-    reg_date,
-    update_date,
-    `password`,
-    `name`,
-    company
-) VALUES (
-	'user3',
-    NOW(),
-    NOW(),
-    '1234',
-    '이무개',
-    '삼성전자'
-);
-# 게시물 테이블 생성
-CREATE TABLE `article` (
-    `idx` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, -- 게시글 고유번호
-    `reg_date` DATETIME NOT NULL,
-    `update_date` DATETIME NOT NULL,
-    `title` VARCHAR(200) NOT NULL,
-    `body` TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS instances (
+  idx INT AUTO_INCREMENT PRIMARY KEY,
+  instance_index VARCHAR(100) NOT NULL,
+  conferment VARCHAR(255) COMMENT '귀속',
+  regional_certification VARCHAR(255) COMMENT '지역인증',
+  temperature VARCHAR(255) COMMENT '온도',
+  instance_name VARCHAR(255) NOT NULL,
+  flow VARCHAR(50),
+  status VARCHAR(50) DEFAULT 'available',
+  standby_id VARCHAR(50) NULL,
+  street_number VARCHAR(255) DEFAULT '',
+  virtual_address VARCHAR(255) DEFAULT '',
+  longitude VARCHAR(100) DEFAULT '',
+  latitude VARCHAR(100) DEFAULT '',
+  count int DEFAULT 0,
+  aicount int DEFAULT 0,
+  article_setup int DEFAULT 0,
+  comment_setup int DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+)
 
 
+
+CREATE TABLE article (
+    idx BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    group_id CHAR(36) NOT NULL COMMENT '묶음 식별자 (UUID)',
+    reg_date DATETIME NOT NULL,
+    update_date DATETIME NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    body TEXT NOT NULL,
     main_image_urls TEXT COMMENT '다중 파일 선택',
     virtual_address VARCHAR(255) NOT NULL COMMENT '가상주소',
-
-
+    longitude VARCHAR(255) COMMENT '경도',
+    latitude VARCHAR(255) COMMENT '위도',
     place_zipcode VARCHAR(10) COMMENT '본문우편번호',
     place_address VARCHAR(255) COMMENT '본문장소주소',
     place_address_detail VARCHAR(255) COMMENT '상세주소',
     place_address_extra VARCHAR(255) COMMENT '참고항목',
-
     subject VARCHAR(100) NOT NULL COMMENT '주제 선택',
-
-    comment_content TEXT COMMENT '댓글 내용',
-    comment_zipcode VARCHAR(10) COMMENT '댓글우편번호',
-    comment_address VARCHAR(255) COMMENT '댓글장소주소',
-	comment_address_detail VARCHAR(255) COMMENT '상세주소',
-    comment_address_extra VARCHAR(255) COMMENT '참고항목',
-
-    image_url VARCHAR(500) COMMENT '단일 파일 선택',
-    reply_content TEXT COMMENT '대댓글 내용',
-
-    longitude VARCHAR(255) COMMENT '경도',
-    latitude VARCHAR(255) COMMENT '위도',
-
-
-
-
-	`user_idx` BIGINT UNSIGNED NOT NULL,
-	`status` VARCHAR(200)
+    article_url VARCHAR(255) COMMENT '게시글 주소',
+    article_instance_name VARCHAR(255),
+    user_idx BIGINT UNSIGNED NOT NULL,
+    status VARCHAR(200)
 );
 
 
 
--- INSERT INTO `article` (
---     `reg_date`, `update_date`, `title`, `body`,
---     `main_image_urls`, `zipcode`, `address`, `address_detail`, `address_extra`,
---     `subject`, `comment_content`, `location_address`,
---     `image_url`, `reply_content`, `user_idx`
--- ) VALUES (
---     NOW(), NOW(),
---     '테스트 제목',
---     '이것은 테스트 본문입니다.',
---     '[]',
---     '12345',
---     '서울특별시 강남구 테헤란로 123',
---     '201호',
---     '강남빌딩',
---     '기술',
---     '댓글 내용 예시입니다.',
---     '서울특별시 중구 을지로 45',
---     'single_image.jpg',
---     '대댓글 예시입니다.',
---     2
--- );
 
 
 
+CREATE TABLE comment (
+    idx BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    group_id CHAR(36) NOT NULL COMMENT 'article과 같은 group_id',
+    reg_date DATETIME NOT NULL,
+    update_date DATETIME NOT NULL,
 
+    comment_content TEXT COMMENT '댓글 내용',
+    comment_zipcode VARCHAR(10),
+    comment_address VARCHAR(255),
+    comment_address_detail VARCHAR(255),
+    comment_address_extra VARCHAR(255),
+    image_url VARCHAR(500),
+    comment_instance_name VARCHAR(255),
+
+    user_idx BIGINT UNSIGNED NOT NULL,
+    status VARCHAR(200)
+
+);
+
+
+
+CREATE TABLE reply (
+    idx BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    group_id CHAR(36) NOT NULL COMMENT 'article과 같은 group_id',
+    reg_date DATETIME NOT NULL,
+    update_date DATETIME NOT NULL,
+    replye_instance_name VARCHAR(255),
+
+    reply_content TEXT COMMENT '대댓글 내용',
+    user_idx BIGINT UNSIGNED NOT NULL,
+    status VARCHAR(200)
+
+);
+
+
+
+CREATE TABLE article_crawling (
+    idx BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    group_id CHAR(36) NOT NULL COMMENT 'article과 같은 group_id',
+    article_idx BIGINT NOT NULL COMMENT 'article의 idx',
+    reg_date DATETIME NOT NULL COMMENT '작성시간',
+    title VARCHAR(255) COMMENT '게시글 제목',
+    body VARCHAR(255) COMMENT '게시글 본문',
+    category VARCHAR(50) COMMENT '주제 subject',
+    author VARCHAR(50) COMMENT '게시글 작성자',
+    virtual_address VARCHAR(255) NOT NULL COMMENT '가상주소',
+    place_address VARCHAR(255) COMMENT '본문장소주소',
+    `like` VARCHAR(10) COMMENT '좋아요 수',
+    content TEXT COMMENT '댓글 대댓글의 모든 정보 json형식',
+    views VARCHAR(10) COMMENT '조회수',
+    main_image_urls TEXT COMMENT 'artcle 이미지',
+    user_idx BIGINT UNSIGNED NOT NULL COMMENT '게시글 작성자 idx',
+    status VARCHAR(200) COMMENT '상태'
+
+);
+
+
+USE MARKETING_BD;
 
 select * from user;
 select * from article;
-
-
-
+select * from comment;
+select * from reply;
+select * from article_crawling;
+select * from instances;

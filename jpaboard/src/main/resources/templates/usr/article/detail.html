@@ -3,6 +3,171 @@
       layout:decorate="~{usr/common/layout}">
 <head>
   <title>게시물 본문</title>
+  <script>
+  function crawlArticle() {
+      // Thymeleaf 변수를 직접 사용
+      var articleUrl = '[[${article.articleUrl}]]';
+      var articleIdx = '[[${article.idx}]]';
+      
+      if (!articleUrl || articleUrl === '') {
+          alert('크롤링할 URL이 없습니다.');
+          return;
+      }
+      
+      // 버튼 비활성화 및 로딩 표시
+      const btn = document.querySelector('.crawl-btn');
+      const originalText = btn.textContent;
+      btn.textContent = '크롤링 중...';
+      btn.disabled = true;
+      btn.style.backgroundColor = '#6c757d';
+      
+      // 크롤링 요청
+      fetch('/api/crawl', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              articleIdx: articleIdx,
+              url: articleUrl
+          })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              // 크롤링된 데이터를 화면에 표시
+              displayCrawledData(data.data);
+              alert('크롤링이 완료되었습니다!');
+          } else {
+              alert('크롤링 실패: ' + data.message);
+          }
+      })
+      .catch(error => {
+          console.error('Error:', error);
+          alert('크롤링 중 오류가 발생했습니다.');
+      })
+      .finally(() => {
+          // 버튼 상태 복원
+          btn.textContent = originalText;
+          btn.disabled = false;
+          btn.style.backgroundColor = '#007bff';
+            });
+  }
+  
+  // 크롤링된 데이터를 화면에 표시하는 함수
+  function displayCrawledData(crawledData) {
+      console.log('크롤링된 데이터:', crawledData);
+      
+      // 제목 표시
+      if (crawledData.title) {
+          document.getElementById('crawled-title').innerHTML = 
+              '<strong>크롤링된 제목:</strong> ' + crawledData.title;
+          document.getElementById('crawled-title').style.display = 'block';
+      }
+      
+      // 내용 표시
+      if (crawledData.content) {
+          document.getElementById('crawled-body').innerHTML = 
+              '<strong>크롤링된 내용:</strong> ' + crawledData.content;
+          document.getElementById('crawled-body').style.display = 'block';
+      }
+      
+      // 이미지 표시
+      if (crawledData.mainImage) {
+          document.getElementById('crawled-image').innerHTML = 
+              '<strong>크롤링된 이미지:</strong> <a href="' + crawledData.mainImage + '" target="_blank">' + crawledData.mainImage + '</a>';
+          document.getElementById('crawled-image').style.display = 'block';
+      }
+      
+      // 추가 정보를 화면에 표시
+      let additionalInfo = '<div style="margin-top: 10px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">';
+      additionalInfo += '<h4 style="margin: 0 0 10px 0; color: #007bff;">크롤링된 상세 정보</h4>';
+      
+      if (crawledData.category) {
+          additionalInfo += '<p><strong>카테고리:</strong> ' + crawledData.category + '</p>';
+      }
+      if (crawledData.authorName) {
+          additionalInfo += '<p><strong>작성자:</strong> ' + crawledData.authorName + '</p>';
+      }
+      if (crawledData.location) {
+          additionalInfo += '<p><strong>위치:</strong> ' + crawledData.location + '</p>';
+      }
+      if (crawledData.address) {
+          additionalInfo += '<p><strong>상세주소:</strong> ' + crawledData.address + '</p>';
+      }
+      if (crawledData.likes) {
+          additionalInfo += '<p><strong>좋아요:</strong> ' + crawledData.likes + '</p>';
+      }
+      if (crawledData.comments) {
+          additionalInfo += '<p><strong>댓글:</strong> ' + crawledData.comments + '</p>';
+      }
+      if (crawledData.saves) {
+          additionalInfo += '<p><strong>저장:</strong> ' + crawledData.saves + '</p>';
+      }
+      if (crawledData.views) {
+          additionalInfo += '<p><strong>조회수:</strong> ' + crawledData.views + '</p>';
+      }
+      if (crawledData.createdTime) {
+          additionalInfo += '<p><strong>작성시간:</strong> ' + crawledData.createdTime + '</p>';
+      }
+      
+      // 댓글 정보 표시
+      if (crawledData.comments) {
+          try {
+              const comments = JSON.parse(crawledData.comments);
+              if (comments.length > 0) {
+                  additionalInfo += '<h5 style="margin: 15px 0 10px 0; color: #007bff;">댓글 정보</h5>';
+                  additionalInfo += '<p><strong>댓글 수:</strong> ' + comments.length + '개</p>';
+                  
+                  // 첫 번째 댓글 미리보기
+                  if (comments[0]) {
+                      const firstComment = comments[0];
+                      additionalInfo += '<div style="background: #fff; padding: 8px; border-radius: 4px; border: 1px solid #dee2e6; margin: 5px 0;">';
+                      additionalInfo += '<strong>' + (firstComment.authorName || '익명') + '</strong>: ';
+                      additionalInfo += (firstComment.content || '내용 없음');
+                      if (firstComment.replies && firstComment.replies.length > 0) {
+                          additionalInfo += ' <span style="color: #6c757d;">(답글 ' + firstComment.replies.length + '개)</span>';
+                      }
+                      additionalInfo += '</div>';
+                  }
+              }
+          } catch (e) {
+              console.error('댓글 파싱 오류:', e);
+          }
+      }
+      
+      additionalInfo += '</div>';
+      
+      // 추가 정보를 이미지 아래에 표시
+      document.getElementById('crawled-image').insertAdjacentHTML('afterend', additionalInfo);
+      
+      // 콘솔에도 출력
+      console.log('=== 크롤링 결과 ===');
+      console.log('제목:', crawledData.title);
+      console.log('내용:', crawledData.content);
+      console.log('카테고리:', crawledData.category);
+      console.log('작성자:', crawledData.authorName);
+      console.log('위치:', crawledData.location);
+      console.log('상세주소:', crawledData.address);
+      console.log('좋아요:', crawledData.likes);
+      console.log('댓글:', crawledData.comments);
+      console.log('저장:', crawledData.saves);
+      console.log('조회수:', crawledData.views);
+      console.log('작성시간:', crawledData.createdTime);
+      console.log('이미지:', crawledData.mainImage);
+      
+      // 댓글 정보 콘솔 출력
+      if (crawledData.comments) {
+          try {
+              const comments = JSON.parse(crawledData.comments);
+              console.log('댓글 수:', comments.length);
+              console.log('댓글 상세:', comments);
+          } catch (e) {
+              console.log('댓글 파싱 오류:', e);
+          }
+      }
+  }
+</script>
 </head>
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -42,7 +207,10 @@
       </tr>
       <tr>
         <th>게시글주소</th>
-        <td class="overflow--text"><a th:href="${article.articleUrl}" target="_blank" rel="noopener noreferrer">게시글 주소로 이동</a></td>
+        <td class="overflow--text">
+          <a th:href="${article.articleUrl}" target="_blank" rel="noopener noreferrer">게시글 주소로 이동</a>
+          <button type="button" class="crawl-btn" onclick="crawlArticle()" style="margin-left: 10px; padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">크롤링</button>
+        </td>
       </tr>
       <tr>
         <th>게시글작성계정</th>
@@ -58,17 +226,26 @@
       </tr>
       <tr>
       <th>제목</th>
-      <td class="overflow--text"> [[${article.title}]]</td>
+      <td class="overflow--text"> 
+        <span id="article-title">[[${article.title}]]</span>
+        <div id="crawled-title" style="display: none; color: #007bff; font-weight: bold;"></div>
+      </td>
       </tr>
 
       <tr>
       <th>내용</th>
-      <td class="overflow--text"> [[${article.body}]]</td>
+      <td class="overflow--text"> 
+        <span id="article-body">[[${article.body}]]</span>
+        <div id="crawled-body" style="display: none; color: #007bff; font-weight: bold;"></div>
+      </td>
       </tr>
 
       <tr>
       <th>본문이미지주소</th>
-      <td class="overflow--text"> [[${article.mainImageUrls}]]</td>
+      <td class="overflow--text"> 
+        <span id="article-image">[[${article.mainImageUrls}]]</span>
+        <div id="crawled-image" style="display: none; color: #007bff; font-weight: bold;"></div>
+      </td>
       </tr>
 
       <tr>
