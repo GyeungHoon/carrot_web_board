@@ -2,7 +2,7 @@
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" xmlns:th="http://www.thymeleaf.org"
       layout:decorate="~{usr/common/layout}">
 <head>
-  <title>게시물 본문</title>
+  <title>상세페이지</title>
   <script>
   function crawlArticle() {
       // Thymeleaf 변수를 직접 사용
@@ -142,31 +142,31 @@
       document.getElementById('crawled-image').insertAdjacentHTML('afterend', additionalInfo);
       
       // 콘솔에도 출력
-      console.log('=== 크롤링 결과 ===');
-      console.log('제목:', crawledData.title);
-      console.log('내용:', crawledData.content);
-      console.log('카테고리:', crawledData.category);
-      console.log('작성자:', crawledData.authorName);
-      console.log('위치:', crawledData.location);
-      console.log('상세주소:', crawledData.address);
-      console.log('좋아요:', crawledData.likes);
-      console.log('댓글:', crawledData.comments);
-      console.log('저장:', crawledData.saves);
-      console.log('조회수:', crawledData.views);
-      console.log('작성시간:', crawledData.createdTime);
-      console.log('이미지:', crawledData.mainImage);
+<!--      console.log('=== 크롤링 결과 ===');-->
+<!--      console.log('제목:', crawledData.title);-->
+<!--      console.log('내용:', crawledData.content);-->
+<!--      console.log('카테고리:', crawledData.category);-->
+<!--      console.log('작성자:', crawledData.authorName);-->
+<!--      console.log('위치:', crawledData.location);-->
+<!--      console.log('상세주소:', crawledData.address);-->
+<!--      console.log('좋아요:', crawledData.likes);-->
+<!--      console.log('댓글:', crawledData.comments);-->
+<!--      console.log('저장:', crawledData.saves);-->
+<!--      console.log('조회수:', crawledData.views);-->
+<!--      console.log('작성시간:', crawledData.createdTime);-->
+<!--      console.log('이미지:', crawledData.mainImage);-->
       
       // 댓글 정보 콘솔 출력
-      if (crawledData.comments) {
-          try {
-              const comments = JSON.parse(crawledData.comments);
-              console.log('댓글 수:', comments.length);
-              console.log('댓글 상세:', comments);
-          } catch (e) {
-              console.log('댓글 파싱 오류:', e);
-          }
-      }
-  }
+<!--      if (crawledData.comments) {-->
+<!--          try {-->
+<!--              const comments = JSON.parse(crawledData.comments);-->
+<!--              console.log('댓글 수:', comments.length);-->
+<!--              console.log('댓글 상세:', comments);-->
+<!--          } catch (e) {-->
+<!--              console.log('댓글 파싱 오류:', e);-->
+<!--          }-->
+<!--      }-->
+<!--  }-->
 </script>
 </head>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -208,8 +208,9 @@
       <tr>
         <th>게시글주소</th>
         <td class="overflow--text">
-          <a th:href="${article.articleUrl}" target="_blank" rel="noopener noreferrer">게시글 주소로 이동</a>
-          <button type="button" class="crawl-btn" onclick="crawlArticle()" style="margin-left: 10px; padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">크롤링</button>
+          <a th:href="${article.articleUrl}" target="_blank" rel="noopener noreferrer">게시글 주소로 이동</a> /
+          <a th:href="@{sync(idx=${article.idx})}">동기화 페이지로 이동</a>
+          <button type="button" class="crawl-btn" onclick="crawlArticle()" style="margin-left: 10px; padding: 5px 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">동기화</button>
         </td>
       </tr>
       <tr>

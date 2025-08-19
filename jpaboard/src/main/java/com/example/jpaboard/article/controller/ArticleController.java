@@ -8,10 +8,9 @@ import com.example.jpaboard.article.dao.ArticleRepository;
 import com.example.jpaboard.article.dao.CommentRepository;
 import com.example.jpaboard.article.dao.InstancesRepository;
 import com.example.jpaboard.article.dao.ReplyRepository;
-import com.example.jpaboard.article.domain.Article;
-import com.example.jpaboard.article.domain.Comment;
-import com.example.jpaboard.article.domain.Reply;
-import com.example.jpaboard.article.domain.Instances;
+import com.example.jpaboard.article.dao.ArticleCrawlingRepository;
+import com.example.jpaboard.article.domain.*;
+import com.example.jpaboard.crawling.service.CrawlingService;
 import com.example.jpaboard.user.dao.UserRepository;
 import com.example.jpaboard.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.ArrayList;
 
 @Controller
 @RequestMapping("/usr/article")
@@ -44,6 +44,12 @@ public class ArticleController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ArticleCrawlingRepository articleCrawlingRepository;
+    
+    @Autowired
+    private CrawlingService crawlingService;
 
 
     @RequestMapping("list")
@@ -328,6 +334,62 @@ public class ArticleController {
         return "usr/article/detail";
     }
 
+
+    @RequestMapping("sync")
+    public String showSync(long idx, Model model, HttpSession session) {
+
+        boolean isLogined = false;
+        long loginedUserId = 0;
+        short roleLevel = 0;
+
+        if (session.getAttribute("loginedUserId") != null) {
+            isLogined = true;
+            loginedUserId = (long) session.getAttribute("loginedUserId");
+
+            // 로그인한 사용자 정보 조회
+            User loginedUser = userRepository.findById(loginedUserId).orElse(null);
+            if (loginedUser != null) {
+                roleLevel = loginedUser.getRoleLevel();
+            }
+        }
+
+//        if (!isLogined) {
+//            model.addAttribute("msg", "로그인 후 이용해주세요.");
+//            model.addAttribute("historyBack", true);
+//            return "common/js";
+//        }
+
+        // 특정 게시글 조회
+        Optional<Article> articleOpt = articleRepository.findById(idx);
+        if (articleOpt.isEmpty()) {
+            model.addAttribute("msg", "게시글을 찾을 수 없습니다.");
+            return "common/js";
+        }
+        
+        Article article = articleOpt.get();
+        
+                // 해당 게시글의 크롤링 데이터 조회
+        Optional<ArticleCrawling> crawlingOpt = articleCrawlingRepository.findByArticleIdx(idx);
+        
+        // 크롤링된 댓글 데이터 파싱
+        List<Map<String, Object>> crawledComments = new ArrayList<>();
+        if (crawlingOpt.isPresent() && crawlingOpt.get().getContent() != null) {
+            crawledComments = crawlingService.parseCommentsFromJson(crawlingOpt.get().getContent());
+        }
+        
+        // 댓글과 대댓글 조회 (groupId로 조회)
+        List<Comment> comments = commentRepository.findByGroupId(article.getGroupId());
+        List<Reply> replys = replyRepository.findByGroupId(article.getGroupId());
+        
+        model.addAttribute("article", article);
+        model.addAttribute("crawling", crawlingOpt.orElse(null));  // 크롤링 데이터 추가
+        model.addAttribute("crawledComments", crawledComments);    // 파싱된 댓글 데이터
+        model.addAttribute("comments", comments);
+        model.addAttribute("replys", replys);
+
+
+        return "usr/article/sync";
+    }
 //    @RequestMapping("modify")
 //    public String showModify(long idx, Model model, HttpSession session) {
 //        boolean isLogined = false;

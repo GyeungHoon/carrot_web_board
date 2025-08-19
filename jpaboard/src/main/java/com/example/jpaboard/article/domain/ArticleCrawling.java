@@ -2,12 +2,16 @@ package com.example.jpaboard.article.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "article_crawling")
 public class ArticleCrawling {
@@ -63,29 +67,6 @@ public class ArticleCrawling {
     @Column(name = "status", length = 200)
     private String status;
     
-    // 기본 생성자
-//    public ArticleCrawling() {}
-    
-    // 생성자
-    public ArticleCrawling(String groupId, Long articleIdx, LocalDateTime regDate, String title, 
-                          String body, String category, String author, String virtualAddress, 
-                          String placeAddress, String like, String content, String views, 
-                          String mainImageUrls, Long userIdx, String status) {
-        this.groupId = groupId;
-        this.articleIdx = articleIdx;
-        this.regDate = regDate;
-        this.title = title;
-        this.body = body;
-        this.category = category;
-        this.author = author;
-        this.virtualAddress = virtualAddress;
-        this.placeAddress = placeAddress;
-        this.like = like;
-        this.content = content;
-        this.views = views;
-        this.mainImageUrls = mainImageUrls;
-        this.userIdx = userIdx;
-        this.status = status;
-    }
+    // Lombok이 자동으로 생성자를 생성합니다
 
 }

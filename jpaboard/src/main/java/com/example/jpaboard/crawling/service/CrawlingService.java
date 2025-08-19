@@ -16,6 +16,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.List;
+import java.util.ArrayList;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @Transactional
@@ -26,6 +30,8 @@ public class CrawlingService {
     
     @Autowired
     private ArticleCrawlingRepository articleCrawlingRepository;
+    
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * 웹페이지를 크롤링하여 기본 정보를 추출합니다.
@@ -490,6 +496,24 @@ public class CrawlingService {
     }
     
     /**
+     * JSON 댓글 데이터를 파싱하여 객체 리스트로 변환합니다.
+     */
+    public List<Map<String, Object>> parseCommentsFromJson(String commentsJson) {
+        try {
+            if (commentsJson == null || commentsJson.trim().isEmpty()) {
+                return new ArrayList<>();
+            }
+            
+            TypeReference<List<Map<String, Object>>> typeRef = new TypeReference<List<Map<String, Object>>>() {};
+            return objectMapper.readValue(commentsJson, typeRef);
+            
+        } catch (Exception e) {
+            System.err.println("댓글 JSON 파싱 중 오류: " + e.getMessage());
+            return new ArrayList<>();
+        }
+    }
+    
+    /**
      * 댓글 데이터를 DB에 저장합니다.
      */
     private void saveCommentsToDatabase(Long articleIdx, String commentsJson) {
@@ -520,8 +544,9 @@ public class CrawlingService {
                 return;
             }
             
-            // ArticleCrawling 객체 생성
+            // ArticleCrawling 객체 생성 (idx는 null로 설정하여 자동 생성되도록 함)
             ArticleCrawling articleCrawling = new ArticleCrawling(
+                null,                                    // idx (자동 생성)
                 article.getGroupId(),                    // group_id
                 articleIdx,                              // article_idx
                 java.time.LocalDateTime.now(),           // reg_date (현재 시간)
