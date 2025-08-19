@@ -18,7 +18,7 @@ ec2 구동하는 명령어
 
 우분트로 접속하기 
 admin@DESKTOP-OJFCL8U MINGW64 ~/desktop
-$ scp -i mainkey.pem ~/desktop/jpaBoard-0.0.1-SNAPSHOT-plain.jar ubuntu@ec2-3-34-183-83.ap-northeast-2.compute.amazonaws.com:~/
+ssh -i mainkey.pem ubuntu@ec2-3-34-183-83.ap-northeast-2.compute.amazonaws.com
 
 ubuntu@ip-172-31-40-125:~$ ps aux | grep jpaBoard
 
