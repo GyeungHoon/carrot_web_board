@@ -40,8 +40,12 @@
                 <td>[[${crawling.views}]]</td>
             </tr>
             <tr>
-                <th>시간</th>
+                <th>등록시간</th>
                 <td>[[${#temporals.format(crawling.regDate, 'yyyy-MM-dd HH:mm:ss')}]]</td>
+            </tr>
+            <tr>
+                <th>업데이트시간</th>
+                <td>[[${#temporals.format(crawling.updateDate, 'yyyy-MM-dd HH:mm:ss')}]]</td>
             </tr>
             <tr>
                 <th>댓글</th>

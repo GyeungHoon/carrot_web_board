@@ -540,16 +540,40 @@ public class CrawlingService {
         try {
             // 기존 크롤링 데이터가 있는지 확인
             if (articleCrawlingRepository.existsByArticleIdx(articleIdx)) {
-                System.out.println("이미 크롤링 데이터가 존재합니다: articleIdx=" + articleIdx);
+                // 기존 데이터가 있으면 업데이트
+                System.out.println("기존 크롤링 데이터를 업데이트합니다: articleIdx=" + articleIdx);
+                
+                Optional<ArticleCrawling> existingOpt = articleCrawlingRepository.findByArticleIdx(articleIdx);
+                if (existingOpt.isPresent()) {
+                    ArticleCrawling existing = existingOpt.get();
+                    
+                    // 데이터 업데이트 (update_date만 현재 시간으로 변경)
+                    existing.setUpdateDate(java.time.LocalDateTime.now());
+                    existing.setTitle(crawledData.get("title"));
+                    existing.setBody(crawledData.get("content"));
+                    existing.setCategory(crawledData.get("category"));
+                    existing.setAuthor(crawledData.get("authorName"));
+                    existing.setPlaceAddress(crawledData.get("address"));
+                    existing.setLike(crawledData.get("likes"));
+                    existing.setContent(crawledData.get("comments"));
+                    existing.setViews(crawledData.get("views"));
+                    existing.setMainImageUrls(crawledData.get("mainImage"));
+                    existing.setStatus("updated");
+                    
+                    // DB에 저장
+                    articleCrawlingRepository.save(existing);
+                    System.out.println("크롤링 데이터를 업데이트했습니다: articleIdx=" + articleIdx);
+                }
                 return;
             }
             
-            // ArticleCrawling 객체 생성 (idx는 null로 설정하여 자동 생성되도록 함)
+            // 새 데이터 생성 (idx는 null로 설정하여 자동 생성되도록 함)
             ArticleCrawling articleCrawling = new ArticleCrawling(
                 null,                                    // idx (자동 생성)
                 article.getGroupId(),                    // group_id
                 articleIdx,                              // article_idx
                 java.time.LocalDateTime.now(),           // reg_date (현재 시간)
+                java.time.LocalDateTime.now(),           // update_date (현재 시간)
                 crawledData.get("title"),                // title
                 crawledData.get("content"),              // body
                 crawledData.get("category"),             // category
@@ -566,7 +590,7 @@ public class CrawlingService {
             
             // DB에 저장
             articleCrawlingRepository.save(articleCrawling);
-            System.out.println("크롤링 데이터를 article_crawling 테이블에 저장했습니다: articleIdx=" + articleIdx);
+            System.out.println("새로운 크롤링 데이터를 저장했습니다: articleIdx=" + articleIdx);
             
         } catch (Exception e) {
             System.err.println("크롤링 데이터 저장 중 오류: " + e.getMessage());

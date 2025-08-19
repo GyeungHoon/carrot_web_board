@@ -31,6 +31,9 @@ public class ArticleCrawling {
     @Column(name = "reg_date", nullable = false)
     private LocalDateTime regDate;
     
+    @Column(name = "update_date", nullable = false)
+    private LocalDateTime updateDate;
+    
     @Column(name = "title")
     private String title;
     

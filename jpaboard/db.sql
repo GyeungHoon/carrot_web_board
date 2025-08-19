@@ -140,6 +140,7 @@ CREATE TABLE article_crawling (
     group_id CHAR(36) NOT NULL COMMENT 'article과 같은 group_id',
     article_idx BIGINT NOT NULL COMMENT 'article의 idx',
     reg_date DATETIME NOT NULL COMMENT '작성시간',
+    update_date DATETIME NOT NULL COMMENT '업데이트시간',
     title VARCHAR(255) COMMENT '게시글 제목',
     body VARCHAR(255) COMMENT '게시글 본문',
     category VARCHAR(50) COMMENT '주제 subject',
@@ -154,6 +155,7 @@ CREATE TABLE article_crawling (
     status VARCHAR(200) COMMENT '상태'
 
 );
+
 
 
 USE MARKETING_BD;

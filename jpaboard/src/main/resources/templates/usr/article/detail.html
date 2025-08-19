@@ -56,7 +56,7 @@
   
   // 크롤링된 데이터를 화면에 표시하는 함수
   function displayCrawledData(crawledData) {
-      console.log('크롤링된 데이터:', crawledData);
+<!--      console.log('크롤링된 데이터:', crawledData);-->
       
       // 제목 표시
       if (crawledData.title) {
@@ -142,31 +142,31 @@
       document.getElementById('crawled-image').insertAdjacentHTML('afterend', additionalInfo);
       
       // 콘솔에도 출력
-<!--      console.log('=== 크롤링 결과 ===');-->
-<!--      console.log('제목:', crawledData.title);-->
-<!--      console.log('내용:', crawledData.content);-->
-<!--      console.log('카테고리:', crawledData.category);-->
-<!--      console.log('작성자:', crawledData.authorName);-->
-<!--      console.log('위치:', crawledData.location);-->
-<!--      console.log('상세주소:', crawledData.address);-->
-<!--      console.log('좋아요:', crawledData.likes);-->
-<!--      console.log('댓글:', crawledData.comments);-->
-<!--      console.log('저장:', crawledData.saves);-->
-<!--      console.log('조회수:', crawledData.views);-->
-<!--      console.log('작성시간:', crawledData.createdTime);-->
-<!--      console.log('이미지:', crawledData.mainImage);-->
+// <!--      console.log('=== 크롤링 결과 ===');-->
+// <!--      console.log('제목:', crawledData.title);-->
+// <!--      console.log('내용:', crawledData.content);-->
+// <!--      console.log('카테고리:', crawledData.category);-->
+// <!--      console.log('작성자:', crawledData.authorName);-->
+// <!--      console.log('위치:', crawledData.location);-->
+// <!--      console.log('상세주소:', crawledData.address);-->
+// <!--      console.log('좋아요:', crawledData.likes);-->
+// <!--      console.log('댓글:', crawledData.comments);-->
+// <!--      console.log('저장:', crawledData.saves);-->
+// <!--      console.log('조회수:', crawledData.views);-->
+// <!--      console.log('작성시간:', crawledData.createdTime);-->
+// <!--      console.log('이미지:', crawledData.mainImage);-->
       
       // 댓글 정보 콘솔 출력
-<!--      if (crawledData.comments) {-->
-<!--          try {-->
-<!--              const comments = JSON.parse(crawledData.comments);-->
-<!--              console.log('댓글 수:', comments.length);-->
-<!--              console.log('댓글 상세:', comments);-->
-<!--          } catch (e) {-->
-<!--              console.log('댓글 파싱 오류:', e);-->
-<!--          }-->
-<!--      }-->
-<!--  }-->
+// <!--      if (crawledData.comments) {-->
+// <!--          try {-->
+// <!--              const comments = JSON.parse(crawledData.comments);-->
+// <!--              console.log('댓글 수:', comments.length);-->
+// <!--              console.log('댓글 상세:', comments);-->
+// <!--          } catch (e) {-->
+// <!--              console.log('댓글 파싱 오류:', e);-->
+// <!--          }-->
+// <!--      }-->
+}
 </script>
 </head>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -206,7 +206,7 @@
         <td class="overflow--text">[[${article.virtualAddress}]]</td>
       </tr>
       <tr>
-        <th>게시글주소</th>
+        <th>링크</th>
         <td class="overflow--text">
           <a th:href="${article.articleUrl}" target="_blank" rel="noopener noreferrer">게시글 주소로 이동</a> /
           <a th:href="@{sync(idx=${article.idx})}">동기화 페이지로 이동</a>
@@ -227,26 +227,26 @@
       </tr>
       <tr>
       <th>제목</th>
-      <td class="overflow--text"> 
-        <span id="article-title">[[${article.title}]]</span>
-        <div id="crawled-title" style="display: none; color: #007bff; font-weight: bold;"></div>
-      </td>
+                      <td class="overflow--text">
+                    <span id="article-title">[[${article.title}]]</span>
+                    <div id="crawled-title" style="display: none; color: #007bff; font-weight: bold;"></div>
+                </td>
       </tr>
 
       <tr>
       <th>내용</th>
-      <td class="overflow--text"> 
-        <span id="article-body">[[${article.body}]]</span>
-        <div id="crawled-body" style="display: none; color: #007bff; font-weight: bold;"></div>
-      </td>
+                      <td class="overflow--text">
+                    <span id="article-body">[[${article.body}]]</span>
+                    <div id="crawled-body" style="display: none; color: #007bff; font-weight: bold;"></div>
+                </td>
       </tr>
 
       <tr>
       <th>본문이미지주소</th>
-      <td class="overflow--text"> 
-        <span id="article-image">[[${article.mainImageUrls}]]</span>
-        <div id="crawled-image" style="display: none; color: #007bff; font-weight: bold;"></div>
-      </td>
+                      <td class="overflow--text">
+                    <span id="article-image">[[${article.mainImageUrls}]]</span>
+                    <div id="crawled-image" style="display: none; color: #007bff; font-weight: bold;"></div>
+                </td>
       </tr>
 
       <tr>
