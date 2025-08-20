@@ -10,7 +10,10 @@
         <h2>동기화 정보</h2>
         <table class="detail__table" th:if="${crawling != null}">
             <!-- 크롤링 데이터 표시 -->
-
+            <tr>
+                <th>그룹아이디</th>
+                <td>[[${article.title}]]</td>
+            </tr>
             <tr>
                 <th>제목</th>
                 <td>[[${crawling.title}]]</td>

@@ -353,11 +353,27 @@ public class ArticleController {
             }
         }
 
-//        if (!isLogined) {
-//            model.addAttribute("msg", "로그인 후 이용해주세요.");
-//            model.addAttribute("historyBack", true);
-//            return "common/js";
-//        }
+        if (isLogined == false) {
+            model.addAttribute("msg", "로그인 후 이용해주세요.");
+            model.addAttribute("historyBack", true);
+            return "common/js";
+        }
+
+        Optional<Article> opArticle = articleRepository.findById(idx);
+        if (opArticle.isEmpty()) {
+            model.addAttribute("msg", "존재하지 않는 게시글입니다.");
+            model.addAttribute("historyBack", true);
+            return "common/js";
+        }
+
+        Article articles = opArticle.get();
+
+        // 관리자가 아니고, 자신이 작성한 게시글이 아닌 경우 접근 제한
+        if (roleLevel < 10 && !articles.getUser().getIdx().equals(loginedUserId)) {
+            model.addAttribute("msg", "권한이 없습니다.");
+            model.addAttribute("historyBack", true);
+            return "common/js";
+        }
 
         // 특정 게시글 조회
         Optional<Article> articleOpt = articleRepository.findById(idx);
@@ -365,7 +381,7 @@ public class ArticleController {
             model.addAttribute("msg", "게시글을 찾을 수 없습니다.");
             return "common/js";
         }
-        
+
         Article article = articleOpt.get();
         
                 // 해당 게시글의 크롤링 데이터 조회
@@ -535,6 +551,7 @@ public class ArticleController {
         reply.setGroupId(groupId);
         reply.setRegDate(LocalDateTime.now());
         reply.setUpdateDate(LocalDateTime.now());
+        reply.setCommentContent(commentContent);
         reply.setReplyContent(reply_content);
 
 
