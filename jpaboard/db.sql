@@ -99,7 +99,7 @@ CREATE TABLE comment (
     group_id CHAR(36) NOT NULL COMMENT 'article과 같은 group_id',
     reg_date DATETIME NOT NULL,
     update_date DATETIME NOT NULL,
-   
+    comment_use_instance VARCHAR(255),
     comment_content TEXT COMMENT '댓글 내용',
     comment_zipcode VARCHAR(10),
     comment_address VARCHAR(255),
@@ -120,11 +120,12 @@ CREATE TABLE reply (
     group_id CHAR(36) NOT NULL COMMENT 'article과 같은 group_id',
     reg_date DATETIME NOT NULL,
     update_date DATETIME NOT NULL,
-    replye_instance_name VARCHAR(255),
+    reply_use_instance VARCHAR(255),
 	comment_content TEXT COMMENT '대댓글 내용',
     reply_content TEXT COMMENT '대댓글 내용',
     user_idx BIGINT UNSIGNED NOT NULL,
     status VARCHAR(200)
+    reply_instance_name VARCHAR(255),
 
 );
 
@@ -134,8 +135,8 @@ CREATE TABLE article_crawling (
     idx BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     group_id CHAR(36) NOT NULL COMMENT 'article과 같은 group_id',
     article_idx BIGINT NOT NULL COMMENT 'article의 idx',
-    reg_date DATETIME NOT NULL COMMENT '작성시간', 
-    update_date DATETIME NOT NULL COMMENT '업데이트시간', 
+    reg_date DATETIME NOT NULL COMMENT '작성시간',
+    update_date DATETIME NOT NULL COMMENT '업데이트시간',
     title VARCHAR(255) COMMENT '게시글 제목',
     body VARCHAR(255) COMMENT '게시글 본문',
     category VARCHAR(50) COMMENT '주제 subject',
@@ -151,12 +152,14 @@ CREATE TABLE article_crawling (
 
 );
 
-                
+
 USE MARKETING_BD;
 
 select * from user;
 select * from article;
 select * from comment;
 select * from reply;
+
 select * from article_crawling;
 select * from instances;
+

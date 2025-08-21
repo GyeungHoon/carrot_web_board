@@ -12,7 +12,7 @@
             <!-- 크롤링 데이터 표시 -->
             <tr>
                 <th>그룹아이디</th>
-                <td>[[${article.title}]]</td>
+                <td>[[${article.groupId}]]</td>
             </tr>
             <tr>
                 <th>제목</th>
@@ -75,6 +75,21 @@
                                 <span>👍 <span th:text="${comment.likes}">좋아요 수</span></span>
                                 <span>💬 <span th:text="${comment.replies != null ? comment.replies.size() : 0}">0</span></span>
                             </div>
+
+                            <form action="doWriteReply" method="get">
+                                <select name="replyUseInstance" class="worklist__contents" style="border:1px solid black; width:1000px;">
+                                    <option th:each="instance : ${instancesLists}"
+                                            th:value="${instance.instance_name}"
+                                            th:text="'계정 : '+${instance.instance_name} + ' - 지역인증 : ' + ${instance.regional_certification} + ' - 온도 : ' + ${instance.temperature} + ' - 지역 : ' + ${instance.street_number} + ' - 상태 : ' + ${instance.status} + ' - 할당여부 : ' + (${instance.conferment == loginedUserId} ? '🔒보유중' : '✅미할당')">
+                                    </option>
+                                </select>
+                                <br>
+                                <input type="hidden" name="groupId" th:value="${article.groupId}">
+                                <input type="hidden" name="articleIdx" th:value="${article.idx}">
+                                <input type="hidden" name="commentContent" th:value="${comment.content}">
+                                <input style="border:1px solid black" type="text" name="replyContent" id="replyContent" maxlength="50">
+                                <input style="border:1px solid black" type="submit" value="제출">
+                            </form>
                             
                             <!-- 대댓글 반복 -->
                             <div th:if="${comment.replies != null and !comment.replies.empty}">
@@ -112,7 +127,22 @@
             </tr>
         </table>
 
+        <h2>댓글 작성란</h2>
+        <form action="doWriteComment" method="get">
+            <select name="commentUseInstance" class="worklist__contents" style="border:1px solid black; width:1000px;">
+                <option th:each="instance : ${instancesLists}" 
+                        th:value="${instance.instance_name}"
+                        th:text="'계정 : '+${instance.instance_name} + ' - 지역인증 : ' + ${instance.regional_certification} + ' - 온도 : ' + ${instance.temperature} + ' - 지역 : ' + ${instance.street_number} + ' - 상태 : ' + ${instance.status} + ' - 할당여부 : ' + (${instance.conferment == loginedUserId} ? '🔒보유중' : '✅미할당')">
+                </option>
+            </select>
+            <br>
+            <input type="hidden" name="groupId" th:value="${article.groupId}">
+            <input type="hidden" name="articleIdx" th:value="${article.idx}">
+            <input style="border:1px solid black" type="text" name="commentContent" id="commentContent" maxlength="50">
+            <input style="border:1px solid black" type="submit" value="제출">
+        </form>
     </article>
 </main>
+
 
 </html>

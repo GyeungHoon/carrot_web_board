@@ -215,15 +215,36 @@
       </tr>
       <tr>
         <th>게시글작성계정</th>
-        <td class="overflow--text"> [[${article.articleInstanceName}]]</td>
+        <td>
+          <select name="articleInstance" id="articleInstance" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+            <option value="[[${article.articleInstanceName}]]" selected>
+              [[${article.articleInstanceName}]]
+            </option>
+          </select>
+        </td>
       </tr>
       <tr>
         <th>댓글작성계정</th>
-        <td class="overflow--text" th:each="comment : ${comments}"> [[${comment.commentInstanceName}]]</td>
+        <td>
+          <select name="commentInstance" id="commentInstance" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+            <option th:each="comment : ${comments}"
+                    th:value="${comment.commentInstanceName}"
+                    th:text="${comment.commentInstanceName}">
+            </option>
+          </select>
+        </td>
       </tr>
       <tr>
         <th>대댓글작성계정</th>
-        <td class="overflow--text" th:each="reply : ${replys}"> [[${reply.replyInstanceName}]]</td>
+        <td>
+          <select name="replyInstance" id="replyInstance" style="width: 100%; padding: 5px; border: 1px solid #ddd; border-radius: 4px;">
+            <option th:each="reply : ${replys}"
+                    th:value="${reply.replyInstanceName}"
+                    th:text="${reply.replyInstanceName}">
+            </option>
+          </select>
+        </td>
+
       </tr>
       <tr>
       <th>제목</th>
@@ -273,11 +294,11 @@
       <th>댓글</th>
       <td class="overflow--text">
         <div th:each="comment : ${comments}">
-          <div>[[${comment.commentContent}]]</div>
-          <div>장소주소: [[${comment.commentAddress}]]</div>
-          <div>상세주소: [[${comment.commentAddressDetail}]]</div>
-          <div>추가항목: [[${comment.commentAddressExtra}]]</div>
-          <div>사진주소: [[${comment.imageUrl}]]</div>
+          <span>댓글내용: [[${comment.commentContent}]] | </span>
+          <span>장소주소: [[${comment.commentAddress}]] | </span>
+<!--          <span>상세주소: [[${comment.commentAddressDetail}]] | </span>-->
+<!--          <span>추가항목: [[${comment.commentAddressExtra}]] | </span>-->
+          <span>사진주소: [[${comment.imageUrl}]]</span>
         </div>
       </td>
       </tr>

@@ -21,6 +21,8 @@ public class Instances {
     private Long idx;
     private Long instance_index;
     private String conferment;
+    private String regional_certification;
+    private String temperature;
     private String instance_name;
     private String flow;
     private String status;

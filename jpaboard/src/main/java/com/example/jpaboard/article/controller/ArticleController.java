@@ -284,7 +284,14 @@ public class ArticleController {
     }
 
     @RequestMapping("detail")
-    public String showDetail(long idx, Model model, HttpSession session) {
+    public String showDetail(Long idx, Model model, HttpSession session) {
+        
+        // idx 파라미터 null 체크
+        if (idx == null) {
+            model.addAttribute("msg", "잘못된 접근입니다.");
+            model.addAttribute("historyBack", true);
+            return "common/js";
+        }
 
         boolean isLogined = false;
         long loginedUserId = 0;
@@ -336,7 +343,14 @@ public class ArticleController {
 
 
     @RequestMapping("sync")
-    public String showSync(long idx, Model model, HttpSession session) {
+    public String showSync(Long idx, Model model, HttpSession session) {
+        
+        // idx 파라미터 null 체크
+        if (idx == null) {
+            model.addAttribute("msg", "잘못된 접근입니다.");
+            model.addAttribute("historyBack", true);
+            return "common/js";
+        }
 
         boolean isLogined = false;
         long loginedUserId = 0;
@@ -375,7 +389,10 @@ public class ArticleController {
             return "common/js";
         }
 
-        // 특정 게시글 조회
+        // 모든 게시글 조회 (여러 개 표시용)
+        List<Article> allArticles = articleRepository.findAll();
+        
+        // 특정 게시글 조회 (크롤링 데이터용)
         Optional<Article> articleOpt = articleRepository.findById(idx);
         if (articleOpt.isEmpty()) {
             model.addAttribute("msg", "게시글을 찾을 수 없습니다.");
@@ -384,7 +401,7 @@ public class ArticleController {
 
         Article article = articleOpt.get();
         
-                // 해당 게시글의 크롤링 데이터 조회
+        // 해당 게시글의 크롤링 데이터 조회
         Optional<ArticleCrawling> crawlingOpt = articleCrawlingRepository.findByArticleIdx(idx);
         
         // 크롤링된 댓글 데이터 파싱
@@ -396,12 +413,26 @@ public class ArticleController {
         // 댓글과 대댓글 조회 (groupId로 조회)
         List<Comment> comments = commentRepository.findByGroupId(article.getGroupId());
         List<Reply> replys = replyRepository.findByGroupId(article.getGroupId());
+
+        // 계정조회 - 필터링된 instances만 조회
+        String userId = String.valueOf(loginedUserId);
+        String articleStreetNumber = article.getPlaceAddress(); // article의 주소
+        String articleVirtualAddress = article.getVirtualAddress(); // article의 가상주소
         
-        model.addAttribute("article", article);
+        List<Instances> instancesLists = instancesRepository.findFilteredInstances(
+            userId, 
+            articleStreetNumber, 
+            articleVirtualAddress
+        );
+        
+        model.addAttribute("articles", allArticles);  // 여러 게시글 목록
+        model.addAttribute("article", article);    // 현재 선택된 게시글 (크롤링 데이터용)
         model.addAttribute("crawling", crawlingOpt.orElse(null));  // 크롤링 데이터 추가
         model.addAttribute("crawledComments", crawledComments);    // 파싱된 댓글 데이터
         model.addAttribute("comments", comments);
         model.addAttribute("replys", replys);
+        model.addAttribute("instancesLists", instancesLists);
+        model.addAttribute("loginedUserId", String.valueOf(loginedUserId));  // 로그인한 사용자 ID를 String으로 추가
 
 
         return "usr/article/sync";
@@ -587,4 +618,173 @@ public class ArticleController {
                 """.formatted(article.getIdx());
     }
 
+
+    @RequestMapping("doWriteComment")
+    @ResponseBody
+    public String doWriteComment(String groupId, String commentUseInstance,String commentContent,
+                                 String commentZipcode,String commentAddress, String commentAddressDetail,
+                                 String commentAddressExtra, String imageUrl, String articleIdx, HttpSession session) {
+
+        boolean isLogined = false;
+        long loginedUserId = 0;
+        if(session.getAttribute("loginedUserId") != null){
+            isLogined = true;
+            loginedUserId = (long)session.getAttribute("loginedUserId");
+        }
+
+        if(isLogined == false){
+            return """
+                <script>
+                alert('로그인 후 이용해주세요.');
+                history.back();
+                </script>
+                """;
+        }
+
+
+        if (commentContent == null || commentContent.trim().length() == 0) {
+            return """
+                <script>
+                alert('댓글을 입력해주세요.');
+                history.back();
+                </script>
+                """;
+        }
+        commentContent = commentContent.trim();
+
+
+
+        Comment comment = new Comment();
+        comment.setGroupId(groupId);
+        comment.setRegDate(LocalDateTime.now());
+        comment.setUpdateDate(LocalDateTime.now());
+        comment.setCommentUseInstance(commentUseInstance);
+        comment.setCommentContent(commentContent);
+        comment.setCommentZipcode(commentZipcode);
+        comment.setCommentAddress(commentAddress);
+        comment.setCommentAddressDetail(commentAddressDetail);
+        comment.setCommentAddressExtra(commentAddressExtra);
+        comment.setImageUrl(imageUrl);
+
+        User user = userRepository.findById(loginedUserId).get();
+        comment.setUser(user);
+
+        if (user.getBalance() < 30000 ) {
+            return """
+                <script>
+                alert('요금을 충전해주세요.');
+                history.back();
+                </script>
+                """;
+        }
+
+        // 선택된 계정의 conferment를 현재 사용자 ID로 업데이트
+        if (commentUseInstance != null && !commentUseInstance.trim().isEmpty()) {
+            Optional<Instances> instanceOpt = instancesRepository.findByInstanceName(commentUseInstance);
+            if (instanceOpt.isPresent()) {
+                Instances instance = instanceOpt.get();
+                // 미할당된 계정인 경우에만 할당
+                if (instance.getConferment() == null || instance.getConferment().trim().isEmpty()) {
+                    instance.setConferment(String.valueOf(loginedUserId));
+                    instance.setUpdated_at(LocalDateTime.now());
+                    instancesRepository.save(instance);
+                }
+            }
+        }
+
+        user.setBalance(user.getBalance() - 30000);
+        userRepository.save(user);
+
+        commentRepository.save(comment);
+        return """
+                <script>
+                alert('%d번 댓글이 생성되었습니다.');
+                location.replace('detail?idx=%s');
+                </script>
+                """.formatted(comment.getIdx(), articleIdx);
+    }
+
+    @RequestMapping("doWriteReply")
+    @ResponseBody
+    public String doWriteReply(String groupId, String replyUseInstance,String commentContent, String replyContent,
+                               String articleIdx, HttpSession session) {
+
+        boolean isLogined = false;
+        long loginedUserId = 0;
+        if(session.getAttribute("loginedUserId") != null){
+            isLogined = true;
+            loginedUserId = (long)session.getAttribute("loginedUserId");
+        }
+
+        if(isLogined == false){
+            return """
+                <script>
+                alert('로그인 후 이용해주세요.');
+                history.back();
+                </script>
+                """;
+        }
+
+
+        if (replyContent == null || replyContent.trim().length() == 0) {
+            return """
+                <script>
+                alert('대댓글을 입력해주세요.');
+                history.back();
+                </script>
+                """;
+        }
+        replyContent = replyContent.trim();
+
+
+
+        Reply reply = new Reply();
+        reply.setGroupId(groupId);
+        reply.setRegDate(LocalDateTime.now());
+        reply.setUpdateDate(LocalDateTime.now());
+        reply.setReplyUseInstance(replyUseInstance);
+        reply.setCommentContent(commentContent);
+        reply.setReplyContent(replyContent);
+
+
+        User user = userRepository.findById(loginedUserId).get();
+        reply.setUser(user);
+
+        if (user.getBalance() < 30000 ) {
+            return """
+                <script>
+                alert('요금을 충전해주세요.');
+                history.back();
+                </script>
+                """;
+        }
+
+        // 선택된 계정의 conferment를 현재 사용자 ID로 업데이트
+        if (replyUseInstance != null && !replyUseInstance.trim().isEmpty()) {
+            Optional<Instances> instanceOpt = instancesRepository.findByInstanceName(replyUseInstance);
+            if (instanceOpt.isPresent()) {
+                Instances instance = instanceOpt.get();
+                // 미할당된 계정인 경우에만 할당
+                if (instance.getConferment() == null || instance.getConferment().trim().isEmpty()) {
+                    instance.setConferment(String.valueOf(loginedUserId));
+                    instance.setUpdated_at(LocalDateTime.now());
+                    instancesRepository.save(instance);
+                }
+            }
+        }
+
+        user.setBalance(user.getBalance() - 30000);
+        userRepository.save(user);
+
+        replyRepository.save(reply);
+        return """
+                <script>
+                alert('%d번 대댓글이 생성되었습니다.');
+                location.replace('detail?idx=%s');
+                </script>
+                """.formatted(reply.getIdx(), articleIdx);
+    }
+
 }
+
+

@@ -29,6 +29,7 @@ public class Reply {
     private String replyContent;
     private String replyInstanceName;
     private String commentContent; // 댓글 내용 필드 추가
+    private String replyUseInstance;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_idx")  // 이 부분 확인

@@ -33,6 +33,7 @@ public class Comment {
     private String commentAddressExtra;
     private String imageUrl;
     private String commentInstanceName;
+    private String CommentUseInstance;
 
 
     @ManyToOne(fetch = FetchType.LAZY)
