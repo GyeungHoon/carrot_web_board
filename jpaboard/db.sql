@@ -163,3 +163,95 @@ select * from reply;
 select * from article_crawling;
 select * from instances;
 
+
+
+
+
+
+-- A는 용, B,T는 아스콧, C는 송도, D는 이천,
+-- C, D는 생성 후 보 보관 (당근체크, 당근 둘다 웨이팅이 필요)
+-- A,B,T는 바로 판매 (당근체크만 웨이팅)
+
+SELECT * from log_pass_finder_carrot order by no DESC;
+SELECT * from log_pass_finder_carrot where location = 'B' or location = 'A' order by no ASC;
+SELECT * from log_pass_finder_carrot where   location = 'T' order by no ASC;
+SELECT * from log_pass_finder_carrot where   location = 'D' order by no ASC;
+
+SELECT * FROM log_pass_finder_carrot WHERE location = 'T'  AND no >= (    SELECT no     FROM log_pass_finder_carrot     WHERE number = '01039691284'     AND location = 'T'    LIMIT 1  )ORDER BY no ASC;
+
+SELECT * from log_pass_finder_carrot order by no ASC;
+select * from member;
+select * from las_tool_user;
+INSERT INTO las_tool_user (service, user_id, name, coin, created_at, updated_at)
+VALUES ('livescore', 'asct1_o#w2D^6dg', '라스아스', 0, NOW(), NOW());
+
+
+-- log_create_telegram
+-- server like '%192.168.200.111%'
+-- 용인 1서버 = 192.168.200.111
+-- 2 = 112
+-- 3 = 113
+SELECT * from log_create_telegram WHERE server like '%192.168.200.112%' and status like 'success%' order by no desc;
+SELECT * FROM log_create_telegram
+WHERE server LIKE '%192.168.200.112%'
+  AND status LIKE 'success%'
+  AND created_at >= '2025-08-27 00:00:00'  -- 시작 날짜
+  AND created_at <= '2025-08-28 23:59:59'  -- 종료 날짜
+ORDER BY no DESC;
+
+
+
+select * from phone_status_table;
+select * from get_number_pool;
+
+SELECT *
+FROM phone_status_table pst
+JOIN uuid u ON pst.androidId = u.androidId
+WHERE u.phname LIKE 'B%';
+
+select * from uuid;
+
+SELECT *
+FROM phone_status_table pst
+JOIN uuid u ON pst.androidId = u.androidId
+WHERE u.phname LIKE 'A%'
+  AND pst.status_telegram_check = 'sms_not_receive_3';
+--
+UPDATE phone_status_table pst
+JOIN uuid u ON pst.androidId = u.androidId
+SET pst.status_telegram = ''
+WHERE u.phname LIKE 'A%'
+  AND pst.status_telegram = 'waiting';
+
+
+--
+-- UPDATE phone_status_table pst
+-- JOIN uuid u ON pst.androidId = u.androidId
+-- SET pst.status_carrot = ''
+-- WHERE u.phname LIKE 'D%';
+
+-- 12, 18, 23, 37, 72, 77, 121, 151, 153
+
+-- UPDATE phone_status_table pst
+-- JOIN uuid u ON pst.androidId = u.androidId
+-- SET pst.status_carrot = ''
+-- WHERE u.phname REGEXP '^D-0(0[1-9]|[1-3][0-9]|4[0-4])$';
+
+
+
+-- UPDATE phone_status_table pst
+-- JOIN uuid u ON pst.androidId = u.androidId
+-- SET pst.status_naver = 'waiting'
+-- WHERE u.phname LIKE 'D%'
+--   AND pst.status_naver = 'sms_not_receive_3';
+
+
+-- ALTER TABLE phone_status_table
+-- ADD COLUMN status_carrot_check VARCHAR(255)
+-- AFTER status_carrot;
+
+-- ALTER TABLE phone_status_table
+-- CHANGE telegram_status_check status_telegram_check VARCHAR(255) DEFAULT NULL;
+
+
+select * from maintable;
